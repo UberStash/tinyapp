@@ -42,6 +42,12 @@ app.post('/urls', (req, res) => {
   res.redirect(`/urls/${urlID}`);
 });
 
+app.post('/urls/:shortURL', (req, res) => {
+  const editID = req.params.shortURL;
+  urlDatabase[editID] = req.body.longURL;
+  res.redirect('/urls');
+  
+});
 
 app.get("/urls/:shortURL", (req, res) => {
   const shortURL = req.params.shortURL;
