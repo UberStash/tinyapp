@@ -6,6 +6,11 @@ app.use(bodyParser.urlencoded({extended: true}));
 
 app.set('view engine', 'ejs')
 
+
+const generateRandomString = function() {
+return Math.random().toString(36).substring(8)
+}
+
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
@@ -25,16 +30,29 @@ app.get("/urls", (req, res) => {
 });
 
 app.post('/urls', (req, res) => {
-  console.log(req.body);
-  res.send('Got it ;)')
+  let urlID = generateRandomString()
+  urlDatabase[urlID] = req.body.longURL;
+  //res.send('Got it ;)')
+  res.redirect(`/urls/${urlID}`);
 });
 
 
 app.get("/urls/:shortURL", (req, res) => {
-  let templateVars = {shortURL: req.params.shortURL, longURL: req.params.longURL};
+  const shortURL = req.params.shortURL;
+  const longURL = urlDatabase[shortURL];
+  templateVars = { shortURL, longURL};
   res.render('urls_show', templateVars);
 });
 
+app.get("/u/:shortURL", (req, res) => {
+  const shortURL = req.params.shortURL
+  let longURL = urlDatabase[shortURL];
+  
+  if (!longURL.includes('http://')) {
+  longURL = 'http://' + longURL;
+  }
+  res.redirect(`${longURL}`);
+});
 
 
 app.get("/urls.json", (req, res) => {
