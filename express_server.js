@@ -24,6 +24,12 @@ app.get("/urls/new", (req, res) => {
   res.render('urls_new');
 });
 
+app.post('/urls/:shortURL/delete', (req, res) => {  
+  const shortURL = req.params.shortURL;
+  delete urlDatabase[shortURL]
+  res.redirect(`/urls`);
+});
+
 app.get("/urls", (req, res) => {
   let templateVars = {urls: urlDatabase};
   res.render('urls_index', templateVars);
