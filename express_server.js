@@ -17,8 +17,13 @@ const urlDatabase = {
 };
 
 app.get("/", (req, res) => {
-  res.send("Hello!");
+  res.redirect("/urls");
 });
+
+app.post('/login', (req, res) => {
+  res.cookie('username', req.body.username);
+  res.redirect("/urls")
+})
 
 app.get("/urls/new", (req, res) => {
   res.render('urls_new');
