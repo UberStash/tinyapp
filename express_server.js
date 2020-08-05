@@ -9,6 +9,17 @@ app.use(cookieParser());
 app.set('view engine', 'ejs')
 
 
+
+const users = {};
+
+const createUser = (username, email, password) => {
+  users[username] = {
+  username,
+  email,
+  password
+  }
+}
+
 const generateRandomString = function() {
 return Math.random().toString(36).substring(8)
 }
@@ -27,12 +38,30 @@ app.post('/login', (req, res) => {
   res.redirect("/urls")
 })
 
+app.post('/register', (req, res) => {
+  const username = req.body.username;
+  const email = req.body.email;
+  const password = req.body.password;
+  createUser(username, email, password)
+  res.cookie('username', username);
+  res.redirect("/urls")
+})
+
 app.post('/logout', (req, res) => {
   const username = req.headers
   console.log(username)
   res.clearCookie(`username`);
   res.redirect("/urls")
 })
+
+
+app.get("/urls/register", (req, res) => {
+  let templateVars = {
+    username: req.cookies["username"]
+  };
+  res.render('urls_register', templateVars);
+});
+
 
 app.get("/urls/new", (req, res) => {
   let templateVars = {
