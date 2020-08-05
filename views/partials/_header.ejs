@@ -12,16 +12,18 @@
       </div>
     </div>
   
-    <% if (username) { %>
-      <h5 style="margin-right: 0.4em; margin-top: 0.3em;" class="text-center"> Logged In As: <%= username %> User!</h5>
+    <% if (user_id) { %>
+      <h5 style="margin-right: 0.4em; margin-top: 0.3em;" class="text-center"> Logged In As: <%= user_id %> User!</h5>
       <form class="form-inline" action="/logout" method="POST" >
       <button type="submit" class="btn btn-outline-dark" style='margin-right: 1em';>Logout</button>
     </form>
       <% } else { %>
-        <form class="form-inline" action="/login" method="POST">
-    <input class="form-control" type="text" name="username" placeholder="username" style="width: 150px; margin-right: 1em;">
-      <button type="submit" class="btn btn-outline-dark" style='margin-right: 1em';>Login</button>
-    </form>
+        <form class="form-inline" action="/register" method="GET" >
+          <button type="submit" class="btn btn-outline-dark" style='margin-right: 1em';>Sign Up</button>
+        </form>
+        <form class="form-inline" action="/login" method="GET" >
+          <button type="submit" class="btn btn-outline-dark" style='margin-right: 1em';>Login</button>
+        </form>
     <% } %>
     </div>
   </nav>

@@ -12,9 +12,9 @@ app.set('view engine', 'ejs')
 
 const users = {};
 
-const createUser = (username, email, password) => {
-  users[username] = {
-  username,
+const createUser = (user_id, email, password) => {
+  users[user_id] = {
+  user_id,
   email,
   password
   }
@@ -22,6 +22,33 @@ const createUser = (username, email, password) => {
 
 const generateRandomString = function() {
 return Math.random().toString(36).substring(8)
+}
+
+const validateLogin = (password, email) => {
+  if (!password) {
+     throw new Error('400 You can not leave the password blank!')
+  }
+     for (const u in users) {
+      if (validateEmail(email) && users[u].password === password) {
+        return users[u].user_id;
+      }
+    } 
+    throw new Error('302 Wrong email or password combination!');
+  
+}
+
+
+const validateEmail = (email) => {
+  if (!email) {
+     throw new Error('400 You can not leave the registration blank!')
+  }
+  
+  for (const u in users) {
+    if (users[u].email === email) {
+      return true;
+    }
+  } 
+  return false;
 }
 
 const urlDatabase = {
@@ -33,40 +60,66 @@ app.get("/", (req, res) => {
   res.redirect("/urls");
 });
 
+app.get("/login", (req, res) => {
+  let templateVars = {
+    user_id: ""
+  };
+  res.render('urls_login', templateVars);
+});
+
 app.post('/login', (req, res) => {
-  res.cookie('username', req.body.username);
+  const email = req.body.email;
+  const password = req.body.password;
+  const user_id = validateLogin(password, email)
+  if (user_id) {
+    res.cookie('user_id', user_id);
+    res.redirect("/urls")
+  } else {
+    res.redirect("/login")
+
+  }
+})
+
+app.post('/logout', (req, res) => {
+  const user_id = req.headers
+  res.clearCookie('user_id');
   res.redirect("/urls")
 })
 
 app.post('/register', (req, res) => {
-  const username = req.body.username;
+  const user_id = generateRandomString();
   const email = req.body.email;
   const password = req.body.password;
-  createUser(username, email, password)
-  res.cookie('username', username);
-  res.redirect("/urls")
+ 
+ if(!validateEmail(email)){
+   createUser(user_id, email, password)
+ res.cookie('user_id', user_id);
+ res.redirect("/urls")
+ } else {
+   res.send('Error email is already in use')
+ }
 })
 
-app.post('/logout', (req, res) => {
-  const username = req.headers
-  console.log(username)
-  res.clearCookie(`username`);
-  res.redirect("/urls")
-})
 
-
-app.get("/urls/register", (req, res) => {
+app.get("/register", (req, res) => {
   let templateVars = {
-    username: req.cookies["username"]
+    user_id: ''
   };
   res.render('urls_register', templateVars);
 });
 
+////change below
 
 app.get("/urls/new", (req, res) => {
-  let templateVars = {
-    username: req.cookies["username"]
-  };
+  
+  const userID = req.cookies["user_id"];
+  let templateVars = {};
+  if (userID) {
+    console.log('false')
+    templateVars.user_id = users[req.cookies["user_id"]].email
+  } else {
+    templateVars.user_id = ''
+};
   res.render('urls_new', templateVars);
 });
 
@@ -77,13 +130,18 @@ app.post('/urls/:shortURL/delete', (req, res) => {
 });
 
 app.get("/urls", (req, res) => {
+  const userID = req.cookies["user_id"];
   
   let templateVars = {
     urls: urlDatabase,
-    username: req.cookies['username']
+  }
+      if (userID) {
+        
+        templateVars.user_id = users[req.cookies["user_id"]].email
+      } else {
+        templateVars.user_id = ''
     };
 
-    console.log(templateVars)
   res.render('urls_index', templateVars);
 });
 
@@ -102,12 +160,21 @@ app.post('/urls/:shortURL', (req, res) => {
 });
 
 app.get("/urls/:shortURL", (req, res) => {
+  const userID = req.cookies["user_id"]
   const shortURL = req.params.shortURL;
   const longURL = urlDatabase[shortURL];
-  templateVars = { shortURL, 
+  const templateVars = { 
+    shortURL, 
     longURL,
-    username: req.cookies['username']
   };
+
+  if (userID) {
+    
+    templateVars.user_id = users[req.cookies["user_id"]].email
+  } else {
+    templateVars.user_id = ''
+};
+
   res.render('urls_show', templateVars);
 });
 
