@@ -22,7 +22,7 @@ const salt = bcrypt.genSaltSync(saltRounds);
 const users = {};
 
 
-// URL DATABASE
+// URL DATABASE with starter code
 const urlDatabase = {
   'b2xVn2': { longURL: 'http://www.lighthouselabs.ca', userID:'aJ48lW'}
   
@@ -212,7 +212,7 @@ app.get('/u/:shortURL', (req, res) => {
   }
 });
 
-// DO NOT NEED BUT LEFT ANYWAYS!!!
+// DO NOT NEED BUT LEFT ANYWAYS!!! :)
 app.get('/urls.json', (req, res) => {
   res.json(urlDatabase);
 });

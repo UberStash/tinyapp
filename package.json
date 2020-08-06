@@ -11,7 +11,7 @@
     "type": "git",
     "url": "git+https://github.com/UberStash/tinyapp.git"
   },
-  "author": "COlin McLellan",
+  "author": "Colin McLellan",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/UberStash/tinyapp/issues"

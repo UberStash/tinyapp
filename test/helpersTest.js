@@ -22,7 +22,7 @@ const testUsers = {
 describe('fetchUserByEmail', function() {
   it('should return a user with valid email when given valid email', function() {
     const user = fetchUserByEmail("user@example.com", testUsers)
-    const expectedOutput = "userRandomID";
+    const expectedOutput = testUsers.userRandomID;
     assert.deepEqual(user, expectedOutput);
   });
 });
@@ -38,7 +38,7 @@ describe('fetchUserByEmail', function() {
 describe('fetchUserByEmail', function() {
   it('should return an error with no email', function() {
     const user = fetchUserByEmail("", testUsers);
-    const expectedOutput = 'Error: 400 email is empty';
+    const expectedOutput = 'Error: ERROR 400 email is empty';
     assert.equal(user, expectedOutput);
   });
 });
@@ -51,7 +51,7 @@ describe('fetchUserByEmail', function() {
   });
 });
 
-// validateEmail tests
+// validateEmail tests 
 
 describe('validateEmail', function() {
   it('should return true with valid email when given valid email', function() {
@@ -72,7 +72,7 @@ describe('validateEmail', function() {
 describe('validateEmail', function() {
   it('should return an error with no email', function() {
     const user = validateEmail("", testUsers);
-    const expectedOutput = 'Error: 400 email is empty';
+    const expectedOutput = 'Error: ERROR 400 empty email!';
     assert.equal(user, expectedOutput);
   });
 });

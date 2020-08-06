@@ -12,19 +12,19 @@ const createUser = (user_id, email, password, users) => {
   };
 };
 
-// generates random ids
+// GENERATES RANDOM ID
 const generateRandomString = function() {
   return Math.random().toString(36).substring(8);
 };
 
-// takes in validate email and compares passwords
-// takes in validate email and compares passwords
+
+// CALLS FETCH USER AND COMPARES USERS PASSWORD
 const validateLogin = (password, email, users) => {
   console.log('password', password);
   console.log('email', email);
   
   if (!password) {
-    return Error('400 email is empty');
+    return Error('400 password is empty!');
   }
   const user = fetchUserByEmail(email, users);
   if (user && bcrypt.compareSync(password, user.password)) {
@@ -35,10 +35,10 @@ const validateLogin = (password, email, users) => {
     
 };
 
-// check if email is correct or exists or not enetered
+// check if email is correct or exists or not enetered returns true or false
 const validateEmail = (email, users) => {
   if (!email) {
-    return Error('400 email is empty');
+    return Error('ERROR 400 empty email!');
   }
   
   for (const u in users) {
@@ -50,9 +50,10 @@ const validateEmail = (email, users) => {
   return false;
 };
 
+// check if email is correct or exists or not enetered returns correct user object or false
 const fetchUserByEmail = (email, users) => {
   if (!email) {
-    return Error('400 email is empty');
+    return Error('ERROR 400 email is empty');
   }
   
   for (const u in users) {
