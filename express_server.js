@@ -52,8 +52,8 @@ const validateEmail = (email) => {
 }
 
 const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+  "b2xVn2": { longURL: "http://www.lighthouselabs.ca", userID:"aJ48lW"}
+  
 };
 
 app.get("/", (req, res) => {
@@ -115,23 +115,26 @@ app.get("/urls/new", (req, res) => {
   const userID = req.cookies["user_id"];
   let templateVars = {};
   if (userID) {
-    console.log('false')
     templateVars.user_id = users[req.cookies["user_id"]].email
   } else {
-    templateVars.user_id = ''
+    res.redirect('/login')
 };
   res.render('urls_new', templateVars);
 });
 
 app.post('/urls/:shortURL/delete', (req, res) => {  
+  const userID = req.cookies["user_id"];
+  if (userID === urlDatabase[shortURL].userID) { 
   const shortURL = req.params.shortURL;
   delete urlDatabase[shortURL]
   res.redirect(`/urls`);
+  } else {
+    res.redirect(`/urls`);
+  }
 });
 
 app.get("/urls", (req, res) => {
   const userID = req.cookies["user_id"];
-  
   let templateVars = {
     urls: urlDatabase,
   }
@@ -139,15 +142,16 @@ app.get("/urls", (req, res) => {
         
         templateVars.user_id = users[req.cookies["user_id"]].email
       } else {
-        templateVars.user_id = ''
+        templateVars.user_id = '';
     };
-
+  if (!userID) res.redirect('/login')
   res.render('urls_index', templateVars);
 });
 
 app.post('/urls', (req, res) => {
   let urlID = generateRandomString()
-  urlDatabase[urlID] = req.body.longURL;
+  const userID = req.cookies["user_id"];
+  urlDatabase[urlID] = {longURL: req.body.longURL, userID,};
   //res.send('Got it ;)')
   res.redirect(`/urls/${urlID}`);
 });
@@ -161,11 +165,14 @@ app.post('/urls/:shortURL', (req, res) => {
 
 app.get("/urls/:shortURL", (req, res) => {
   const userID = req.cookies["user_id"]
+  
+  if (userID){
+  
   const shortURL = req.params.shortURL;
-  const longURL = urlDatabase[shortURL];
+  const longURL = urlDatabase[shortURL].longURL;
   const templateVars = { 
     shortURL, 
-    longURL,
+    longURL
   };
 
   if (userID) {
@@ -176,16 +183,19 @@ app.get("/urls/:shortURL", (req, res) => {
 };
 
   res.render('urls_show', templateVars);
+} else {
+  res.redirect('/login')
+}
 });
 
 app.get("/u/:shortURL", (req, res) => {
   const shortURL = req.params.shortURL
-  let longURL = urlDatabase[shortURL];
+  let longURL = urlDatabase[shortURL].longURL;
   
   if (!longURL.includes('http://')) {
   longURL = 'http://' + longURL;
   }
-  res.redirect(`${longURL}`);
+  res.redirect(longURL);
 });
 
 
