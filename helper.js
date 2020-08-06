@@ -1,6 +1,6 @@
 const bcrypt = require('bcrypt');
-const saltRounds = 10;
-const salt = bcrypt.genSaltSync(saltRounds);
+
+
 
 
 // CREATES NEW USER
@@ -20,20 +20,20 @@ const generateRandomString = function() {
 // takes in validate email and compares passwords
 // takes in validate email and compares passwords
 const validateLogin = (password, email, users) => {
-  console.log('password', password)
-  console.log('email', email)
+  console.log('password', password);
+  console.log('email', email);
   
   if (!password) {
-      throw new Error('400 You can not leave the password blank!');
-    }
-     const user = fetchUserByEmail(email, users);
-      if ( user && bcrypt.compareSync(password, user.password)) {
-        return user.user_id;
-      }
+    return Error('400 email is empty');
+  }
+  const user = fetchUserByEmail(email, users);
+  if (user && bcrypt.compareSync(password, user.password)) {
+    return user.user_id;
+  }
     
-    return false;
+  return false;
     
-  };
+};
 
 // check if email is correct or exists or not enetered
 const validateEmail = (email, users) => {
