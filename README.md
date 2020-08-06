@@ -4,8 +4,10 @@ TinyApp is a full stack web application built with Node and Express that allows 
 
 ## Final Product
 
-!["screenshot description"](#)
-!["screenshot description"](#)
+!["urls index page"](https://github.com/UberStash/tinyapp/blob/master/docs/index.png?raw=true)
+!["short urls and edit page"](https://github.com/UberStash/tinyapp/blob/master/docs/shorturl.png?raw=true)
+!["registration page"](https://github.com/UberStash/tinyapp/blob/master/docs/register.png?raw=true)
+!["login page"](https://github.com/UberStash/tinyapp/blob/master/docs/login.png?raw=true)
 
 ## Dependencies
 
