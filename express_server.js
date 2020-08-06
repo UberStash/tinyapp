@@ -35,6 +35,10 @@ app.get('/', (req, res) => {
 });
 // login page request and render
 app.get('/login', (req, res) => {
+  const userID = req.session['user_id'];
+  if (userID) {
+    res.redirect('/urls');
+  }
   let templateVars = {
     user_id: ''
   };
@@ -49,7 +53,7 @@ app.post('/login', (req, res) => {
     req.session.user_id = user_id;
     res.redirect('/urls');
   } else {
-    res.redirect('/login');
+    res.send('You entered a wrong email or password!');
 
   }
 });
@@ -62,6 +66,10 @@ app.post('/logout', (req, res) => {
 
 // render register page
 app.get('/register', (req, res) => {
+  const userID = req.session['user_id'];
+  if (userID) {
+    res.redirect('/urls');
+  }
   let templateVars = {
     user_id: ''
   };
@@ -70,16 +78,20 @@ app.get('/register', (req, res) => {
 
 // register user in users database
 app.post('/register', (req, res) => {
+  
+  
   const user_id = generateRandomString();
   const email = req.body.email;
   const password = bcrypt.hashSync(req.body.password, salt);
- 
+  if (!email || !password) {
+    res.send('ERROR: You must fill out all the fields to register.');
+  }
   if (!validateEmail(email, users)) {
     createUser(user_id, email, password, users);
     req.session.user_id = user_id;
     res.redirect('/urls');
   } else {
-    res.send('Error email is already in use');
+    res.send('ERROR: email is already in use');
   }
 });
 
@@ -129,20 +141,33 @@ app.get('/urls', (req, res) => {
   } else {
     templateVars.user_id = '';
   }
-  if (!userID) res.redirect('/login');
+  if (!userID) {
+    res.send('Error 400, You are not logged in yet!');
+  }
   res.render('urls_index', templateVars);
 });
 
 // creates new url in urls database
 app.post('/urls', (req, res) => {
-  let urlID = generateRandomString();
   const userID = req.session['user_id'];
+  if (!userID) {
+    res.send('Error 400, You are not logged in yet!');
+  }
+  let urlID = generateRandomString();
+  
   urlDatabase[urlID] = {longURL: req.body.longURL, userID,};
   res.redirect(`/urls/${urlID}`);
 });
 
 // edits existing urls in database using url id
 app.post('/urls/:shortURL', (req, res) => {
+  const userID = req.session['user_id'];
+  if (!userID) {
+    res.send('Error you are not logged in!');
+  } else if (userID !== urlDatabase[req.params.shortURL].userID) {
+    res.send('Error you are trying to access someone elses urls!');
+  }
+  
   const editID = req.params.shortURL;
   urlDatabase[editID].longURL = req.body.longURL;
   res.redirect('/urls');
@@ -152,34 +177,33 @@ app.post('/urls/:shortURL', (req, res) => {
 //displays the short url page and also edit if not logged in will redirect to login
 app.get('/urls/:shortURL', (req, res) => {
   const userID = req.session['user_id'];
-  
-  if (userID) {
-  
+  if (urlDatabase[req.params.shortURL] === undefined) {
+    res.send('Error that url does not exist!');
+  }
+
+  if (!userID) {
+    res.send('Error you are not logged in!');
+  } else if (userID !== urlDatabase[req.params.shortURL].userID) {
+    res.send('Error you are trying to access someone elses urls!');
+  } else {
     const shortURL = req.params.shortURL;
     const longURL = urlDatabase[shortURL].longURL;
     const templateVars = {
       shortURL,
-      longURL
+      longURL,
+      user_id: users[req.session['user_id']].email
     };
-
-    if (userID) {
-    
-      templateVars.user_id = users[req.session['user_id']].email;
-    } else {
-      templateVars.user_id = '';
-    }
-
     res.render('urls_show', templateVars);
-  } else {
-    res.redirect('/login');
   }
 });
 
 // makes short urls in page redirect to listed long url and appends the http:// if not provided
 app.get('/u/:shortURL', (req, res) => {
+  if (urlDatabase[req.params.shortURL] === undefined) {
+    res.send('Error that url does not exist!');
+  }
   const shortURL = req.params.shortURL;
   let longURL = urlDatabase[shortURL].longURL;
-  
   if (longURL.includes('http://' || 'https://')) {
     res.redirect(longURL);
   } else {
