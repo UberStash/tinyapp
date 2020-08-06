@@ -124,8 +124,8 @@ app.get("/urls/new", (req, res) => {
 
 app.post('/urls/:shortURL/delete', (req, res) => {  
   const userID = req.cookies["user_id"];
-  if (userID === urlDatabase[shortURL].userID) { 
   const shortURL = req.params.shortURL;
+  if (userID === urlDatabase[shortURL].userID) { 
   delete urlDatabase[shortURL]
   res.redirect(`/urls`);
   } else {
@@ -135,8 +135,16 @@ app.post('/urls/:shortURL/delete', (req, res) => {
 
 app.get("/urls", (req, res) => {
   const userID = req.cookies["user_id"];
+  let userDatabase = {}
+  for (let url in urlDatabase) {
+    
+    console.log('outside if', urlDatabase[url])
+    if (urlDatabase[url].userID === userID) {
+      userDatabase[url] = urlDatabase[url]
+    }
+  }
   let templateVars = {
-    urls: urlDatabase,
+    urls: userDatabase,
   }
       if (userID) {
         
